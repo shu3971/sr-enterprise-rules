@@ -1,1 +1,2 @@
 # ===== 自定义规则 =====
+DOMAIN-SUFFIX,test.com,DIRECT
