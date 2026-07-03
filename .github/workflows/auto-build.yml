@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -22,10 +22,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Build Rules
+      - name: Build rules
         run: python scripts/build.py
 
-      - name: Commit Build File
+      - name: Commit build file
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
