@@ -1,4 +1,6 @@
-name: Build Shadowrocket Rules
+permissions:
+  contents: write
+  name: Build Shadowrocket Rules
 
 on:
   push:
