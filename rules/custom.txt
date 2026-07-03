@@ -1,1 +1,2 @@
 # Custom rules
+DOMAIN-SUFFIX,test.com,DIRECT
