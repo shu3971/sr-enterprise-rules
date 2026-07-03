@@ -1,12 +1,13 @@
-permissions:
-  contents: write
-  name: Build Shadowrocket Rules
+name: Build Shadowrocket Rules
 
 on:
   push:
     paths:
       - "rules/**"
       - "scripts/**"
+
+permissions:
+  contents: write   # ⭐关键修复
 
 jobs:
   build:
