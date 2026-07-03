@@ -1,0 +1,4 @@
+DOMAIN-SUFFIX,adjust.com,REJECT
+DOMAIN-SUFFIX,appsflyer.com,REJECT
+DOMAIN-SUFFIX,doubleclick.net,REJECT
+DOMAIN-SUFFIX,talkingdata.com,REJECT

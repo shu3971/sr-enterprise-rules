@@ -1,0 +1,6 @@
+DOMAIN-SUFFIX,openai.com,PROXY
+DOMAIN-SUFFIX,chatgpt.com,PROXY
+DOMAIN-SUFFIX,anthropic.com,PROXY
+DOMAIN-SUFFIX,gemini.google.com,PROXY
+DOMAIN-SUFFIX,cursor.sh,PROXY
+DOMAIN-SUFFIX,openrouter.ai,PROXY

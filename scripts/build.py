@@ -1,35 +1,55 @@
 import os
 
 RULE_DIR = "rules"
-OUTPUT = "build/main.conf"
+BUILD_DIR = "build"
 
-FILES = [
-    "core.txt",
-    "accelerate.txt",
-    "adblock.txt",
-    "custom.txt"
-]
+profiles = {
+    "main.conf": [
+        "core.txt",
+        "accelerate.txt",
+        "ai.txt",
+        "video.txt",
+        "game.txt",
+        "privacy.txt",
+        "adblock.txt",
+        "custom.txt"
+    ],
 
-lines = []
+    "lite.conf": [
+        "core.txt",
+        "accelerate.txt",
+        "adblock.txt"
+    ],
 
-for filename in FILES:
+    "ai.conf": [
+        "ai.txt"
+    ]
+}
 
-    path = os.path.join(RULE_DIR, filename)
+os.makedirs(BUILD_DIR, exist_ok=True)
 
-    if not os.path.exists(path):
-        continue
+for output_name, files in profiles.items():
 
-    lines.append(f"\n# ===== {filename} =====\n")
+    lines = []
 
-    with open(path, "r", encoding="utf-8") as f:
-        lines.extend(f.readlines())
+    for filename in files:
 
-lines.append("\n# ===== FINAL =====\n")
-lines.append("FINAL,PROXY\n")
+        path = os.path.join(RULE_DIR, filename)
 
-os.makedirs("build", exist_ok=True)
+        if not os.path.exists(path):
+            continue
 
-with open(OUTPUT, "w", encoding="utf-8") as out:
-    out.writelines(lines)
+        lines.append(f"\n# ===== {filename} =====\n")
 
-print("build success")
+        with open(path, "r", encoding="utf-8") as f:
+            lines.extend(f.readlines())
+
+    lines.append("\n# ===== FINAL =====\n")
+    lines.append("FINAL,PROXY\n")
+
+    output_path = os.path.join(BUILD_DIR, output_name)
+
+    with open(output_path, "w", encoding="utf-8") as out:
+        out.writelines(lines)
+
+    print(f"build success -> {output_name}")

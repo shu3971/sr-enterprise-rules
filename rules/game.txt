@@ -1,0 +1,5 @@
+DOMAIN-SUFFIX,steamcontent.com,PROXY
+DOMAIN-SUFFIX,steampowered.com,PROXY
+DOMAIN-SUFFIX,playstation.com,PROXY
+DOMAIN-SUFFIX,nintendo.net,PROXY
+DOMAIN-SUFFIX,xboxlive.com,PROXY

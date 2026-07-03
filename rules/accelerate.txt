@@ -1,18 +1,7 @@
-# ===== CDN =====
-
 DOMAIN-SUFFIX,byteimg.com,DIRECT
 DOMAIN-SUFFIX,bdstatic.com,DIRECT
 DOMAIN-SUFFIX,alicdn.com,DIRECT
 DOMAIN-SUFFIX,volccdn.com,DIRECT
-
-# ===== 音视频 =====
-
 DOMAIN-SUFFIX,trtc.tencentcloud.com,DIRECT
 DOMAIN-SUFFIX,trtcube-license.cn,DIRECT
 DOMAIN-SUFFIX,rtc.qq.com,DIRECT
-
-# ===== 地图 =====
-
-DOMAIN-SUFFIX,baidu.com,DIRECT
-DOMAIN-SUFFIX,amap.com,DIRECT
-DOMAIN-SUFFIX,map.qq.com,DIRECT
