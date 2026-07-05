@@ -1,5 +1,6 @@
 DOMAIN-SUFFIX,youtube.com,PROXY
 DOMAIN-SUFFIX,ytimg.com,PROXY
+DOMAIN-SUFFIX,googlevideo.com,PROXY
 DOMAIN-SUFFIX,netflix.com,PROXY
 DOMAIN-SUFFIX,nflxvideo.net,PROXY
 DOMAIN-SUFFIX,tiktok.com,PROXY

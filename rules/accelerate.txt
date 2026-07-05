@@ -4,4 +4,3 @@ DOMAIN-SUFFIX,alicdn.com,DIRECT
 DOMAIN-SUFFIX,volccdn.com,DIRECT
 DOMAIN-SUFFIX,trtc.tencentcloud.com,DIRECT
 DOMAIN-SUFFIX,trtcube-license.cn,DIRECT
-DOMAIN-SUFFIX,rtc.qq.com,DIRECT

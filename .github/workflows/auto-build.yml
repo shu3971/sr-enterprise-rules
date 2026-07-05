@@ -5,6 +5,10 @@ on:
     paths:
       - "rules/**"
       - "scripts/**"
+  pull_request:
+    paths:
+      - "rules/**"
+      - "scripts/**"
 
 permissions:
   contents: write
@@ -22,16 +26,18 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Build rules
+      - name: Lint rules
         run: python scripts/build.py
 
-      - name: Commit build file
+      - name: Commit build files
+        if: github.event_name == 'push'
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
 
-          git add build/main.conf
+          git add build/
 
-          git commit -m "auto update rules" || exit 0
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
 
+          git commit -m "auto update rules"
           git push

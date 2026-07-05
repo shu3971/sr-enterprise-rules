@@ -1,6 +1,4 @@
 DOMAIN-SUFFIX,oceanengine.com,REJECT
 DOMAIN-SUFFIX,pangolin-sdk-toutiao.com,REJECT
-DOMAIN-SUFFIX,gdt.qq.com,REJECT
 DOMAIN-SUFFIX,e.qq.com,REJECT
 DOMAIN-SUFFIX,umeng.com,REJECT
-DOMAIN-SUFFIX,cnlogs.umeng.com,REJECT
