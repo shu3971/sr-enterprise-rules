@@ -34,7 +34,7 @@ os.makedirs(BUILD_DIR, exist_ok=True)
 has_error = False
 
 for output_name, files in profiles.items():
-    lines = []
+    rules = []
     rule_count = 0
 
     for filename in files:
@@ -50,7 +50,6 @@ for output_name, files in profiles.items():
                 stripped = line.strip()
 
                 if not stripped or stripped.startswith("#"):
-                    lines.append(line)
                     continue
 
                 if not RULE_PATTERN.match(stripped):
@@ -58,19 +57,27 @@ for output_name, files in profiles.items():
                     has_error = True
                     continue
 
-                lines.append(line)
+                rules.append(stripped)
                 file_rules += 1
                 rule_count += 1
 
-        lines.append(f"\n# ===== {filename} =====\n")
         print(f"  {filename}: {file_rules} rules")
 
-    lines.append("\n# ===== FINAL =====\n")
-    lines.append("FINAL,PROXY\n")
+    output_lines = [
+        "[General]",
+        "bypass-system = true",
+        "skip-proxy = 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, localhost, *.local",
+        "tun-excluded-routes = 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.0.0.0/24, 192.168.0.0/16, 224.0.0.0/4, 240.0.0.0/4, 255.255.255.255/32",
+        "",
+        "[Rule]",
+    ]
+
+    output_lines.extend(rules)
+    output_lines.append("FINAL,PROXY")
 
     output_path = os.path.join(BUILD_DIR, output_name)
     with open(output_path, "w", encoding="utf-8") as out:
-        out.writelines(lines)
+        out.write("\n".join(output_lines) + "\n")
 
     print(f"build success -> {output_name} ({rule_count} rules)")
 
