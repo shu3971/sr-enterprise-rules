@@ -1,0 +1,72 @@
+{
+  "domainStrategy": "IPIfNonMatch",
+  "rules": [
+    {
+      "type": "field",
+      "outboundTag": "block",
+      "domain": [
+        "domain:oceanengine.com",
+        "domain:pangolin-sdk-toutiao.com",
+        "domain:e.qq.com",
+        "domain:umeng.com"
+      ]
+    },
+    {
+      "type": "field",
+      "outboundTag": "direct",
+      "domain": [
+        "domain:weixin.qq.com",
+        "domain:im.qq.com",
+        "domain:mp.weixin.qq.com",
+        "domain:douyin.com",
+        "domain:soulapp.cn",
+        "domain:imsummer.cn",
+        "domain:easemob.com",
+        "domain:rongcloud.cn",
+        "domain:baidu.com",
+        "domain:bilibili.com",
+        "domain:zhihu.com",
+        "domain:taobao.com",
+        "domain:alipay.com",
+        "domain:byteimg.com",
+        "domain:bdstatic.com",
+        "domain:alicdn.com",
+        "domain:volccdn.com",
+        "domain:trtc.tencentcloud.com",
+        "domain:trtcube-license.cn"
+      ]
+    },
+    {
+      "type": "field",
+      "outboundTag": "proxy",
+      "domain": [
+        "domain:telegram.org",
+        "domain:t.me",
+        "domain:discord.com",
+        "domain:discord.gg",
+        "domain:slack.com",
+        "domain:zoom.us",
+        "domain:notion.so",
+        "domain:twitter.com",
+        "domain:x.com",
+        "domain:reddit.com",
+        "domain:redd.it",
+        "domain:instagram.com",
+        "domain:facebook.com",
+        "domain:fbcdn.net",
+        "domain:github.com",
+        "domain:githubusercontent.com",
+        "domain:gitlab.com",
+        "domain:npmjs.com",
+        "domain:docker.com",
+        "domain:docker.io",
+        "domain:vercel.app",
+        "domain:vercel.com",
+        "domain:netlify.app",
+        "domain:cloudflare.com",
+        "domain:spotify.com",
+        "domain:scdn.co"
+      ]
+    }
+  ]
+}

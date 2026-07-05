@@ -1,37 +1,27 @@
 import os
 import re
 import sys
+import json
 from collections import Counter
 
 RULE_DIR = "rules"
 BUILD_DIR = "build"
-DNS_BLOCKED = "127.0.0.1"
 
-VALID_POLICIES = {"DIRECT", "PROXY", "REJECT"}
 RULE_PATTERN = re.compile(r"^(DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|USER-AGENT),.+,(DIRECT|PROXY|REJECT)$")
 
 profiles = {
     "main.conf": [
-        "core.txt",
-        "accelerate.txt",
-        "ai.txt",
-        "video.txt",
-        "game.txt",
-        "privacy.txt",
-        "adblock.txt",
-        "custom.txt",
+        "core.txt", "accelerate.txt", "ai.txt", "video.txt",
+        "game.txt", "privacy.txt", "adblock.txt", "custom.txt",
     ],
     "lite.conf": [
-        "core.txt",
-        "accelerate.txt",
-        "adblock.txt",
+        "core.txt", "accelerate.txt", "adblock.txt",
     ],
     "ai.conf": [
         "ai.txt",
     ],
 }
 
-# DNS 防污染配置
 DNS_CONFIG = """[DNS]
 server=223.5.5.5
 server=119.29.29.29
@@ -84,30 +74,23 @@ server=/nintendo.net/8.8.8.8
 server=/xboxlive.com/8.8.8.8
 """
 
-# URL Rewrite 去广告参数
 URL_REWRITE = """[URL Rewrite]
-# 去除电商追踪参数
 ^https://.*\\.taobao\\.com/.*\\?.*spm=.* 302
 ^https://.*\\.jd\\.com/.*\\?.*cu=.* 302
-# 去除社交媒体追踪
 ^https://.*\\.weibo\\.com/.*\\?.*luicode=.* 302
 """
-
-os.makedirs(BUILD_DIR, exist_ok=True)
 
 has_error = False
 global_domains = Counter()
 
 
 def parse_rules(files):
-    """解析规则文件，返回规则列表并检测重复"""
     rules = []
     seen = set()
     duplicates = []
 
     for filename in files:
         path = os.path.join(RULE_DIR, filename)
-
         if not os.path.exists(path):
             print(f"  WARNING: {filename} not found, skipping", file=sys.stderr)
             continue
@@ -115,19 +98,15 @@ def parse_rules(files):
         with open(path, "r", encoding="utf-8") as f:
             for lineno, line in enumerate(f, 1):
                 stripped = line.strip()
-
                 if not stripped or stripped.startswith("#"):
                     continue
-
                 if not RULE_PATTERN.match(stripped):
                     print(f"  ERROR: {filename}:{lineno} invalid rule: {stripped}", file=sys.stderr)
                     global has_error
                     has_error = True
                     continue
-
                 parts = stripped.split(",")
                 key = (parts[0], parts[1])
-
                 if key in seen:
                     duplicates.append((filename, lineno, stripped))
                 else:
@@ -138,49 +117,36 @@ def parse_rules(files):
     return rules, duplicates
 
 
-def generate_shadowrocket(rules, dns=True, url_rewrite=True):
-    """生成 Shadowrocket 格式"""
+def generate_shadowrocket(rules):
     lines = [
         "[General]",
         "bypass-system = true",
         "skip-proxy = 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, localhost, *.local",
         "tun-excluded-routes = 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.0.0.0/24, 192.168.0.0/16, 224.0.0.0/4, 240.0.0.0/4, 255.255.255.255/32",
         "",
+        DNS_CONFIG,
+        "",
+        URL_REWRITE,
+        "",
+        "[Rule]",
     ]
-
-    if dns:
-        lines.append(DNS_CONFIG)
-        lines.append("")
-
-    if url_rewrite:
-        lines.append(URL_REWRITE)
-        lines.append("")
-
-    lines.append("[Rule]")
     lines.extend(rules)
-    lines.append("FINAL,PROXY")
-    lines.append("")
-    lines.append("[MITM]")
-
+    lines.extend(["FINAL,PROXY", "", "[MITM]"])
     return "\n".join(lines)
 
 
 def generate_clash(rules):
-    """生成 Clash YAML 格式"""
-    proxy_rules = []
-    direct_rules = []
-    reject_rules = []
-
+    proxy_rules, direct_rules, reject_rules = [], [], []
     for rule in rules:
         parts = rule.split(",")
         rtype, domain, policy = parts[0], parts[1], parts[2]
-
+        entry = f"  - {rtype},{domain}"
         if policy == "PROXY":
-            proxy_rules.append(f"  - {rtype.replace('DOMAIN-SUFFIX', 'DOMAIN-SUFFIX')},{domain}")
+            proxy_rules.append(entry)
         elif policy == "DIRECT":
-            direct_rules.append(f"  - {rtype.replace('DOMAIN-SUFFIX', 'DOMAIN-SUFFIX')},{domain}")
+            direct_rules.append(entry)
         elif policy == "REJECT":
-            reject_rules.append(f"  - {rtype.replace('DOMAIN-SUFFIX', 'DOMAIN-SUFFIX')},{domain}")
+            reject_rules.append(entry)
 
     lines = [
         "mixed-port: 7890",
@@ -209,29 +175,17 @@ def generate_clash(rules):
         "",
         "rules:",
     ]
-
     if reject_rules:
-        lines.append("  # 广告拦截 & 隐私保护")
-        lines.extend(reject_rules)
-        lines.append("")
-
+        lines.extend(["  # 广告拦截 & 隐私保护"] + reject_rules + [""])
     if proxy_rules:
-        lines.append("  # 海外服务")
-        lines.extend(proxy_rules)
-        lines.append("")
-
+        lines.extend(["  # 海外服务"] + proxy_rules + [""])
     if direct_rules:
-        lines.append("  # 国内直连")
-        lines.extend(direct_rules)
-        lines.append("")
-
+        lines.extend(["  # 国内直连"] + direct_rules + [""])
     lines.append("  - MATCH,PROXY")
-
     return "\n".join(lines)
 
 
 def generate_surge(rules):
-    """生成 Surge 配置格式"""
     lines = [
         "[General]",
         "loglevel = notify",
@@ -240,66 +194,79 @@ def generate_surge(rules):
         "",
         "[Rule]",
     ]
-
     for rule in rules:
         parts = rule.split(",")
-        rtype, domain, policy = parts[0], parts[1], parts[2]
-        surge_type = rtype.replace("DOMAIN-SUFFIX", "DOMAIN-SUFFIX")
-        lines.append(f"{surge_type},{domain},{policy}")
-
+        lines.append(f"{parts[0]},{parts[1]},{parts[2]}")
     lines.append("FINAL,PROXY")
-
     return "\n".join(lines)
 
 
+def generate_v2ray(rules):
+    domain_proxy, domain_direct, domain_reject = [], [], []
+    for rule in rules:
+        parts = rule.split(",")
+        rtype, domain, policy = parts[0], parts[1], parts[2]
+        if policy == "PROXY":
+            domain_proxy.append(domain)
+        elif policy == "DIRECT":
+            domain_direct.append(domain)
+        elif policy == "REJECT":
+            domain_reject.append(domain)
+
+    routing = {"domainStrategy": "IPIfNonMatch", "rules": []}
+    if domain_reject:
+        routing["rules"].append({
+            "type": "field", "outboundTag": "block",
+            "domain": [f"domain:{d}" for d in domain_reject]
+        })
+    if domain_direct:
+        routing["rules"].append({
+            "type": "field", "outboundTag": "direct",
+            "domain": [f"domain:{d}" for d in domain_direct]
+        })
+    if domain_proxy:
+        routing["rules"].append({
+            "type": "field", "outboundTag": "proxy",
+            "domain": [f"domain:{d}" for d in domain_proxy]
+        })
+
+    return json.dumps(routing, indent=2, ensure_ascii=False)
+
+
+FORMATS = {
+    ".conf": ("Shadowrocket", generate_shadowrocket),
+    ".yaml": ("Clash", generate_clash),
+    ".sgconf": ("Surge", generate_surge),
+    ".json": ("V2Ray", generate_v2ray),
+}
+
+
 def build_profile(output_name, files):
-    """构建单个配置文件"""
     print(f"\n{'='*50}")
     print(f"Building: {output_name}")
     print(f"{'='*50}")
 
     rules, duplicates = parse_rules(files)
 
-    # 报告重复
     if duplicates:
         print(f"\n  ⚠️  发现 {len(duplicates)} 条重复规则:")
         for filename, lineno, rule in duplicates:
             print(f"    {filename}:{lineno} -> {rule}")
 
-    # 规则统计
-    policy_count = Counter()
-    for rule in rules:
-        policy = rule.split(",")[-1]
-        policy_count[policy] += 1
-
+    policy_count = Counter(rule.split(",")[-1] for rule in rules)
     print(f"\n  📊 规则统计:")
     print(f"    总计: {len(rules)} 条")
     for policy, count in sorted(policy_count.items()):
         print(f"    {policy}: {count} 条")
 
-    # 生成 Shadowrocket 格式
     if output_name.endswith(".conf"):
-        content = generate_shadowrocket(rules, dns=True, url_rewrite=True)
-        output_path = os.path.join(BUILD_DIR, output_name)
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(content)
-        print(f"  ✅ Shadowrocket -> {output_path}")
-
-        # 生成 Clash 格式
-        clash_name = output_name.replace(".conf", ".yaml")
-        clash_content = generate_clash(rules)
-        clash_path = os.path.join(BUILD_DIR, clash_name)
-        with open(clash_path, "w", encoding="utf-8") as f:
-            f.write(clash_content)
-        print(f"  ✅ Clash -> {clash_path}")
-
-        # 生成 Surge 格式
-        surge_name = output_name.replace(".conf", ".sgconf")
-        surge_content = generate_surge(rules)
-        surge_path = os.path.join(BUILD_DIR, surge_name)
-        with open(surge_path, "w", encoding="utf-8") as f:
-            f.write(surge_content)
-        print(f"  ✅ Surge -> {surge_path}")
+        for ext, (name, generator) in FORMATS.items():
+            fname = output_name.replace(".conf", ext)
+            content = generator(rules)
+            fpath = os.path.join(BUILD_DIR, fname)
+            with open(fpath, "w", encoding="utf-8") as f:
+                f.write(content)
+            print(f"  ✅ {name} -> {fpath}")
 
     return len(rules), len(duplicates)
 
@@ -315,7 +282,6 @@ def main():
         total_rules += rules
         total_duplicates += dups
 
-    # 全局统计
     print(f"\n{'='*50}")
     print(f"📋 全局统计")
     print(f"{'='*50}")
@@ -323,7 +289,6 @@ def main():
     print(f"  唯一域名: {len(global_domains)}")
     print(f"  重复规则: {total_duplicates}")
 
-    # Top 10 重复域名
     most_common = global_domains.most_common(10)
     if most_common:
         print(f"\n  🔝 最常引用的域名:")

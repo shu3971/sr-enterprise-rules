@@ -1,0 +1,28 @@
+{
+  "domainStrategy": "IPIfNonMatch",
+  "rules": [
+    {
+      "type": "field",
+      "outboundTag": "proxy",
+      "domain": [
+        "domain:openai.com",
+        "domain:chatgpt.com",
+        "domain:anthropic.com",
+        "domain:claude.ai",
+        "domain:google.com",
+        "domain:googleapis.com",
+        "domain:cohere.com",
+        "domain:cursor.sh",
+        "domain:openrouter.ai",
+        "domain:perplexity.ai",
+        "domain:groq.com",
+        "domain:mistral.ai",
+        "domain:huggingface.co",
+        "domain:midjourney.com",
+        "domain:poe.com",
+        "domain:copilot.microsoft.com",
+        "domain:bing.com"
+      ]
+    }
+  ]
+}
