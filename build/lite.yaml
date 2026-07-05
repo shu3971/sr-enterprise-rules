@@ -1,0 +1,81 @@
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+
+dns:
+  enable: true
+  nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  fallback:
+    - 8.8.8.8
+    - 1.1.1.1
+  fallback-filter:
+    geoip: true
+    ipcidr:
+      - 240.0.0.0/4
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - DIRECT
+
+rules:
+  # 广告拦截 & 隐私保护
+  - DOMAIN-SUFFIX,oceanengine.com
+  - DOMAIN-SUFFIX,pangolin-sdk-toutiao.com
+  - DOMAIN-SUFFIX,e.qq.com
+  - DOMAIN-SUFFIX,umeng.com
+
+  # 海外服务
+  - DOMAIN-SUFFIX,telegram.org
+  - DOMAIN-SUFFIX,t.me
+  - DOMAIN-SUFFIX,discord.com
+  - DOMAIN-SUFFIX,discord.gg
+  - DOMAIN-SUFFIX,slack.com
+  - DOMAIN-SUFFIX,zoom.us
+  - DOMAIN-SUFFIX,notion.so
+  - DOMAIN-SUFFIX,twitter.com
+  - DOMAIN-SUFFIX,x.com
+  - DOMAIN-SUFFIX,reddit.com
+  - DOMAIN-SUFFIX,redd.it
+  - DOMAIN-SUFFIX,instagram.com
+  - DOMAIN-SUFFIX,facebook.com
+  - DOMAIN-SUFFIX,fbcdn.net
+  - DOMAIN-SUFFIX,github.com
+  - DOMAIN-SUFFIX,githubusercontent.com
+  - DOMAIN-SUFFIX,gitlab.com
+  - DOMAIN-SUFFIX,npmjs.com
+  - DOMAIN-SUFFIX,docker.com
+  - DOMAIN-SUFFIX,docker.io
+  - DOMAIN-SUFFIX,vercel.app
+  - DOMAIN-SUFFIX,vercel.com
+  - DOMAIN-SUFFIX,netlify.app
+  - DOMAIN-SUFFIX,cloudflare.com
+  - DOMAIN-SUFFIX,spotify.com
+  - DOMAIN-SUFFIX,scdn.co
+
+  # 国内直连
+  - DOMAIN-SUFFIX,weixin.qq.com
+  - DOMAIN-SUFFIX,im.qq.com
+  - DOMAIN-SUFFIX,mp.weixin.qq.com
+  - DOMAIN-SUFFIX,douyin.com
+  - DOMAIN-SUFFIX,soulapp.cn
+  - DOMAIN-SUFFIX,imsummer.cn
+  - DOMAIN-SUFFIX,easemob.com
+  - DOMAIN-SUFFIX,rongcloud.cn
+  - DOMAIN-SUFFIX,baidu.com
+  - DOMAIN-SUFFIX,bilibili.com
+  - DOMAIN-SUFFIX,zhihu.com
+  - DOMAIN-SUFFIX,taobao.com
+  - DOMAIN-SUFFIX,alipay.com
+  - DOMAIN-SUFFIX,byteimg.com
+  - DOMAIN-SUFFIX,bdstatic.com
+  - DOMAIN-SUFFIX,alicdn.com
+  - DOMAIN-SUFFIX,volccdn.com
+  - DOMAIN-SUFFIX,trtc.tencentcloud.com
+  - DOMAIN-SUFFIX,trtcube-license.cn
+
+  - MATCH,PROXY

@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Lint rules
+      - name: Build and validate rules
         run: python scripts/build.py
 
       - name: Commit build files
